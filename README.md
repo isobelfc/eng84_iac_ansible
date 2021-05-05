@@ -56,3 +56,10 @@ ip ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
 - `ansible db -m shell -a "uptime"` to find uptime of the db server
 - `ansible all -a "sudo apt-get update"` to update all packages
 - `ansible all -a "sudo apt-get upgrade"` to upgrade
+
+## Playbooks
+- written in YAML with .yml/.yaml extension with set of instructions/tasks to do the configuration management on the hosts/agent nodes
+- YAML files need to start with three dashes `---`
+- indentation should be done with spaces, not tabs
+
+## Setting up Ansible Vault
