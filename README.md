@@ -37,6 +37,7 @@
 - common platform
 - integrates with other tools, e.g. Jenkins, Docker
 
+![Ansible Diagram](ansible_diagram.png)
 
 - command to SSH into app and db from controller is `ssh vagrant@ip`
 
@@ -46,7 +47,6 @@
   - adhoc commands are run directly in the command line, and are useful for rarely used commands
 - need to add hosts to /etc/ansible/hosts
 ```
-[web]
 [web]
 ip ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
 ```
