@@ -148,8 +148,25 @@ ip ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
     key_name: eng84devops
     region: eu-west-1
     image: ami-0943382e114f188e8
+    subnet_id: "subnet-0429d69d55dfad9d2"
+    ansible_python_interpreter: /user/bin/python3
 
   tasks:
+
+    - name: Get instance facts
+      ec2_instance_facts:
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}}"
+        region: "{{region}}"
+      register: result
+      
+    - name: Upload public key to AWS
+      ec2_key:
+        name: "{{ key_name }}"
+        key_material: "{{ lookup('file', '~/.ssh/{{ key_name }}.pub') }}"
+        region: "{{ region }}"
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}
 
     - name: Create security group
       ec2_group:
@@ -191,6 +208,7 @@ ip ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
         count: 1
         instance_tags:
           Name: eng84_isobel_ansible_web
+      tags: ['never', 'launch_ec2']
 ```
 
 - playbook to create db instance:
@@ -200,15 +218,33 @@ ip ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
 
 - hosts: localhost
   connection: local
-  gather_facts: no
+  gather_facts: True
+  become: True
 
   vars:
     key_name: eng84devops
     region: eu-west-1
     image: ami-0943382e114f188e8
+    subnet_id: "subnet-0429d69d55dfad9d2"
+    ansible_python_interpreter: /user/bin/python3
 
   tasks:
-
+  
+    - name: Get instance facts
+      ec2_instance_facts:
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}}"
+        region: "{{region}}"
+      register: result
+      
+    - name: Upload public key to AWS
+      ec2_key:
+        name: "{{ key_name }}"
+        key_material: "{{ lookup('file', '~/.ssh/{{ key_name }}.pub') }}"
+        region: "{{ region }}"
+        aws_access_key: "{{aws_access_key}}"
+        aws_secret_key: "{{aws_secret_key}
+  
     - name: Create security group
       ec2_group:
         name: eng84_isobel_ansible_db_sg
@@ -221,12 +257,12 @@ ip ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
           - proto: tcp
             ports:
               - 22
-            cidr_ip: 195.213.42.152/32
+            cidr_ip: ip/32
 # ssh from controller
           - proto: tcp
             ports:
               - 22
-            cidr_ip: 172.31.29.133/32
+            cidr_ip: ip/32
           - proto: tcp
             ports:
               - 27017
@@ -237,7 +273,7 @@ ip ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
       ec2:
         aws_access_key: "{{aws_access_key}}"
         aws_secret_key: "{{aws_secret_key}}"
-        key_name: eng84devops
+        key_name: "{{key_name}}"
         image: "{{image}}"
         instance_type: t2.micro
         region: "{{region}}"
@@ -245,6 +281,7 @@ ip ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
         count: 1
         instance_tags:
           Name: eng84_isobel_ansible_db
+      tags: ['never', 'launch_ec2']
 ```
 
 - run creation playbooks:
@@ -297,35 +334,6 @@ ip ansible_connection=ssh ansible_ssh_user=ubuntu ansible_ssh_pass=ubuntu
 
   - name: Installing npm in web server
     apt: pkg=npm state=present
-
-#  - name: Cloning Github repo into web server
-#    script: git clone -b main https://github.com/isobelfc/eng84_cicd_jenkins.git
-
-#  - name: Setting database variable
-#    script: echo echo "export DB_HOST="mongodb://192.168.33.11/27017/posts"" >> ~/.bashrc
-
-#  - name: Setting up reverse proxy
- #   bash: |
-  #      sudo echo "server {
-   #       listen 80;
-#
- #         server_name _;
-#
- #         location / {
-  #          proxy_pass http://localhost:3000;
-   #         proxy_http_version 1.1;
-    #        proxy_set_header Upgrade $http_upgrade;
-     #       proxy_set_header Connection 'upgrade';
-      #      proxy_set_header Host $host;
-       #     proxy_cache_bypass $http_upgrade;
-        #  }
-      #  }" | sudo tee /etc/nginx/sites-available/default
-
-#  - name: Running seed.js file in web server
-#    bash: nodejs eng84_cicd_jenkins/app/seeds/seed.js
-
-#  - name: Running app.js
-#    bash: nodejs eng84_cicd_jenkins/app/app.js
 ```
 
 - run provision playbooks:
