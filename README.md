@@ -340,3 +340,6 @@ ip ansible_connection=ssh ansible_ssh_user=ubuntu ansible_ssh_pass=ubuntu
 ```
 ansible-playbook playbook_name.yml --ask-vault-pass
 ```
+
+## AWS Multi AZ Setup
+![Multi AZ diagram](multi_az.png)
